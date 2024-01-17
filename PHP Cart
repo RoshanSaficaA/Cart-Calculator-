@@ -1,0 +1,97 @@
+<?php
+
+// Function to calculate the discount based on rules
+function calculateDiscount($cart, $productQuantities) {
+    $totalQuantity = array_sum($productQuantities);
+    $maxQuantity = max($productQuantities);
+
+    // Rule 4: "tiered_50_discount"
+    if ($totalQuantity > 30 && $maxQuantity > 15) {
+        return ['tiered_50_discount', 0.5];
+    }
+
+    // Rule 3: "bulk_10_discount"
+    if ($totalQuantity > 20) {
+        return ['bulk_10_discount', 0.1];
+    }
+
+    // Rule 2: "bulk_5_discount"
+    foreach ($productQuantities as $quantity) {
+        if ($quantity > 10) {
+            return ['bulk_5_discount', 0.05];
+        }
+    }
+
+    // Rule 1: "flat_10_discount"
+    if ($cart > 200) {
+        return ['flat_10_discount', 10];
+    }
+
+    // No discount
+    return ['', 0];
+}
+
+// Function to calculate fees
+function calculateFees($productQuantities) {
+    $giftWrapFee = array_sum($productQuantities);
+    $shippingFee = ceil(array_sum($productQuantities) / 10) * 5;
+
+    return ['gift_wrap_fee' => $giftWrapFee, 'shipping_fee' => $shippingFee];
+}
+
+// Main program
+
+$products = ['Product A', 'Product B', 'Product C'];
+$prices = [20, 40, 50];
+$productQuantities = [];
+$giftWrapQuantities = [];
+
+// Input quantities and gift wrapping information
+foreach ($products as $product) {
+    echo "Enter quantity for $product: ";
+    $quantity = intval(trim(fgets(STDIN)));
+
+    echo "Is $product wrapped as a gift? (yes/no): ";
+    $isGiftWrapped = strtolower(trim(fgets(STDIN))) === 'yes';
+
+    $productQuantities[] = $quantity;
+    $giftWrapQuantities[] = $isGiftWrapped ? $quantity : 0;
+}
+
+// Calculate subtotal
+$subTotal = 0;
+for ($i = 0; $i < count($products); $i++) {
+    $subTotal += $productQuantities[$i] * $prices[$i];
+}
+
+// For Calculate discount
+list($discountName, $discountAmount) = calculateDiscount($subTotal, $productQuantities);
+
+// For Apply discount
+$discountedTotal = $subTotal - ($subTotal * $discountAmount);
+
+// For Calculate fees
+$fees = calculateFees($giftWrapQuantities);
+$giftWrapFee = $fees['gift_wrap_fee'];
+$shippingFee = $fees['shipping_fee'];
+
+// For Calculate total
+$total = $discountedTotal + $giftWrapFee + $shippingFee;
+
+// Final Output
+echo "\nProduct Details:\n";
+for ($i = 0; $i < count($products); $i++) {
+    $productTotal = $productQuantities[$i] * $prices[$i];
+    echo "{$products[$i]} - Quantity: {$productQuantities[$i]}, Total: \$$productTotal\n";
+}
+
+echo "\nSubtotal: \$$subTotal\n";
+
+if (!empty($discountName)) {
+    echo "Discount Applied: $discountName, Amount: \$$discountAmount\n";
+}
+
+echo "Shipping Fee: \$$shippingFee\n";
+echo "Gift Wrap Fee: \$$giftWrapFee\n";
+echo "Total: \$$total\n";
+?>
