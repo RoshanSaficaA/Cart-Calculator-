@@ -1,28 +1,28 @@
 <?php
 
-// Function to calculate the discount based on rules
+
 function calculateDiscount($cart, $productQuantities) {
     $totalQuantity = array_sum($productQuantities);
     $maxQuantity = max($productQuantities);
 
-    // Rule 4: "tiered_50_discount"
+    // "tiered_50_discount"
     if ($totalQuantity > 30 && $maxQuantity > 15) {
         return ['tiered_50_discount', 0.5];
     }
 
-    // Rule 3: "bulk_10_discount"
+    // "bulk_10_discount"
     if ($totalQuantity > 20) {
         return ['bulk_10_discount', 0.1];
     }
 
-    // Rule 2: "bulk_5_discount"
+    // "bulk_5_discount"
     foreach ($productQuantities as $quantity) {
         if ($quantity > 10) {
             return ['bulk_5_discount', 0.05];
         }
     }
 
-    // Rule 1: "flat_10_discount"
+    // "flat_10_discount"
     if ($cart > 200) {
         return ['flat_10_discount', 10];
     }
@@ -39,26 +39,26 @@ function calculateFees($productQuantities) {
     return ['gift_wrap_fee' => $giftWrapFee, 'shipping_fee' => $shippingFee];
 }
 
-// Main program
+// Main PHP program
 
 $products = ['Product A', 'Product B', 'Product C'];
 $prices = [20, 40, 50];
 $productQuantities = [];
 $giftWrapQuantities = [];
 
-// Input quantities and gift wrapping information
+// Quantity and Wrapping
 foreach ($products as $product) {
     echo "Enter quantity for $product: ";
     $quantity = intval(trim(fgets(STDIN)));
 
-    echo "Is $product wrapped as a gift? (yes/no): ";
+    echo "Do you want to wrap the $product? (yes/no): ";
     $isGiftWrapped = strtolower(trim(fgets(STDIN))) === 'yes';
 
     $productQuantities[] = $quantity;
     $giftWrapQuantities[] = $isGiftWrapped ? $quantity : 0;
 }
 
-// Calculate subtotal
+// For Calculate subtotal
 $subTotal = 0;
 for ($i = 0; $i < count($products); $i++) {
     $subTotal += $productQuantities[$i] * $prices[$i];
@@ -79,7 +79,7 @@ $shippingFee = $fees['shipping_fee'];
 $total = $discountedTotal + $giftWrapFee + $shippingFee;
 
 // Final Output
-echo "\nProduct Details:\n";
+echo "\n\nProduct Details\n";
 for ($i = 0; $i < count($products); $i++) {
     $productTotal = $productQuantities[$i] * $prices[$i];
     echo "{$products[$i]} - Quantity: {$productQuantities[$i]}, Total: \$$productTotal\n";
