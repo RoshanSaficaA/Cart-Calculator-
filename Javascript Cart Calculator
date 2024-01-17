@@ -1,0 +1,87 @@
+// Function to calculate the discount based on rules
+function calculateDiscount(cart, productQuantities) {
+    const totalQuantity = productQuantities.reduce((acc, qty) => acc + qty, 0);
+    const maxQuantity = Math.max(...productQuantities);
+
+    // Rule 4: "tiered_50_discount"
+    if (totalQuantity > 30 && maxQuantity > 15) {
+        return ['tiered_50_discount', 0.5];
+    }
+
+    // Rule 3: "bulk_10_discount"
+    if (totalQuantity > 20) {
+        return ['bulk_10_discount', 0.1];
+    }
+
+    // Rule 2: "bulk_5_discount"
+    if (productQuantities.some(qty => qty > 10)) {
+        return ['bulk_5_discount', 0.05];
+    }
+
+    // Rule 1: "flat_10_discount"
+    if (cart > 200) {
+        return ['flat_10_discount', 10];
+    }
+
+    // No discount
+    return ['', 0];
+}
+
+// Function to calculate fees
+function calculateFees(productQuantities) {
+    const giftWrapFee = productQuantities.reduce((acc, qty) => acc + qty, 0);
+    const shippingFee = Math.ceil(productQuantities.reduce((acc, qty) => acc + qty, 0) / 10) * 5;
+
+    return { giftWrapFee, shippingFee };
+}
+
+// Main Javascript program
+
+const products = ['Product A', 'Product B', 'Product C'];
+const prices = [20, 40, 50];
+const productQuantities = [];
+const giftWrapQuantities = [];
+
+// Quantity and Wrapping 
+for (let i = 0; i < products.length; i++) {
+    const quantity = parseInt(prompt(`Enter the quantity for ${products[i]}:`));
+    const isGiftWrapped = prompt(`Do you want to Wrap the ${products[i]}? (yes/no):`).toLowerCase() === 'yes';
+
+    productQuantities.push(quantity);
+    giftWrapQuantities.push(isGiftWrapped ? quantity : 0);
+}
+
+// For Calculate subtotal
+let subTotal = 0;
+for (let i = 0; i < products.length; i++) {
+    subTotal += productQuantities[i] * prices[i];
+}
+
+// For Calculate discount
+const [discountName, discountAmount] = calculateDiscount(subTotal, productQuantities);
+
+// Apply discount
+const discountedTotal = subTotal - (subTotal * discountAmount);
+
+// For Calculate fees
+const { giftWrapFee, shippingFee } = calculateFees(giftWrapQuantities);
+
+// For Calculate total
+const total = discountedTotal + giftWrapFee + shippingFee;
+
+// Final Output
+console.log("\n\nProduct Details");
+for (let i = 0; i < products.length; i++) {
+    const productTotal = productQuantities[i] * prices[i];
+    console.log(`${products[i]} - Quantity: ${productQuantities[i]}, Total: $${productTotal}`);
+}
+
+console.log(`\nSubtotal: $${subTotal}`);
+
+if (discountName !== '') {
+    console.log(`Discount Applied: ${discountName}, Amount: $${discountAmount}`);
+}
+
+console.log(`Shipping Fee: $${shippingFee}`);
+console.log(`Gift Wrap Fee: $${giftWrapFee}`);
+console.log(`Total: $${total}`);
