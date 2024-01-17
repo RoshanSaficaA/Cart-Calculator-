@@ -1,4 +1,4 @@
-// Function to calculate the discount based on rules
+
 function calculateDiscount(cart, productQuantities) {
     const totalQuantity = productQuantities.reduce((acc, qty) => acc + qty, 0);
     const maxQuantity = Math.max(...productQuantities);
